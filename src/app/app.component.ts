@@ -1,4 +1,3 @@
-import { element } from 'protractor';
 import { Component } from '@angular/core';
 import { Subject } from 'rxjs';
 import { StateService } from './state.service';
@@ -16,12 +15,12 @@ export class AppComponent {
   config = {
     "client-a": {
       loaded: false,
-      path: 'client-a/main.bundle.js',
+      path: 'client-a/main.js',
       element: 'client-a'
     },
     "client-b": {
       loaded: false,
-      path: 'client-b/main.bundle.js',
+      path: 'client-b/main.js',
       element: 'client-b'
     },
     
@@ -40,46 +39,29 @@ export class AppComponent {
     const content = document.getElementById('content');
 
 
-
-
-
-
-
-
-
-
-
-
+    console.log("LAZY LOAD (RUNTIME) BUNDLE FOR miniSPA", name)
     const script = document.createElement('script');
     script.src = configItem.path;
     content.appendChild(script);
+    script.onload = ()=>{
+      console.log("NOW THE SCRIPT IS LOADED", configItem.path);
+      const element: HTMLElement = document.createElement(configItem.element);
+      content.appendChild(element);
+      
+      console.log("ATTACH EVENT & STATE FOR miniSPA CROSS-COMUNICATION ELEMENT<->SHELL");
+      element.addEventListener('message', msg => this.handleMessage(msg));
+      this.stateService.registerClient(element);
+      
+      //SAMPLE INIT STATE (SEND DATA PASSED TO miniSPA)
+      element.setAttribute('state', 'init');
+    }
     
-    const element: HTMLElement = document.createElement(configItem.element);
-    content.appendChild(element);
-
-
-
-
-
-
-
-
-    
-
-
-
-
-    element.addEventListener('message', msg => this.handleMessage(msg));
-    element.setAttribute('state', 'init');
-
     script.onerror = () => console.error(`error loading ${configItem.path}`);
-
-
-    this.stateService.registerClient(element);
 
   }
 
   handleMessage(msg): void {
+    //SAMPLE HANDLE EVENT (READ DATA FROM miniSPA)
     console.debug('shell received message: ', msg.detail);
   }
 
