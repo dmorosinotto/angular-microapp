@@ -1,9 +1,7 @@
-import { Component, Input } from '@angular/core';
-import { ViewEncapsulation, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { ViewEncapsulation, OnInit, AfterViewInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject } from 'rxjs';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Component({
   //selector: 'client-a-widget',
@@ -11,7 +9,8 @@ import { Observable } from 'rxjs';
   <div id="widget">
   <div class="card">
     <div class="header">
-      <h1>Your Flights</h1>
+      <h1 (click)="clickMe()">WebComp Widget - Click ME</h1>
+      <pre>DATA.value = {{value$|push}}</pre>
     </div>
     <div class="content">
   <table class="table table-contensed">
@@ -32,10 +31,7 @@ import { Observable } from 'rxjs';
           <td>Frankfurt</td>
           <td>Graz</td>
       </tr>
-
-      </table>
-  </div>
-</div>
+   </table>
 </div>
 
 
@@ -43,18 +39,38 @@ import { Observable } from 'rxjs';
   styles: [`
         #widget { padding:10px; border: 2px darkred dashed }
   `],
-  encapsulation: ViewEncapsulation.Emulated
+  encapsulation: ViewEncapsulation.Emulated,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ClientAWidgetComponent implements OnInit {
-    control = new FormControl();
-    value$: Observable<string>;
+export class ClientAWidgetComponent implements OnInit, AfterViewInit {
+    @Output() evento = new EventEmitter<any>();
+    @Input() set data(ctrl: FormControl) {
+      console.log("IN SET DATA",ctrl);
+      this._ctrl = ctrl;
+      ctrl.valueChanges.subscribe(this.value$);
+    };
+    get data(): FormControl {
+      return this._ctrl;
+    }
+    private _ctrl: FormControl;
   
+    public value$ = new BehaviorSubject<string>("");
     ngOnInit(): void {
-      this.control.valueChanges.subscribe(x => console.debug(x));
-      this.value$ = this.control.valueChanges;
+      console.log("ONINIT",this.data);
+      //this.data.valueChanges.subscribe(x => console.debug("DA DENTRO AL WIDGET" , x));
+      //this.value$ = this.data.valueChanges;
+    }
+
+    ngAfterViewInit(){
+      console.log("AFTERVIEWINIT",this.data);
+      //this.data.valueChanges.subscribe(x => console.debug("DA DENTRO AL WIDGET" , x));
+      //this.value$ = this.data.valueChanges;
     }
 
     clickMe(): void {
-      console.debug('ouch!');
+      console.debug('click emit evento!');
+      this.evento.emit("CIAO by " + this.value$.getValue());
+      var rndMs = Math.random()*10000; //WAIT MAX 10sec AND GENERATE NEW VALUE
+      setTimeout(()=> this._ctrl.setValue("AFTER " + rndMs), rndMs);
     }
 }
