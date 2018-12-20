@@ -13,9 +13,9 @@ export class StateService {
         this.clients.push(client);
     }
 
-    public setState(state: string) {
+    public setState(state: any) {
         for(let client of this.clients) {
-            client.setAttribute('state', state);
+            client.setAttribute('state', JSON.stringify(state));
         }
     }
 

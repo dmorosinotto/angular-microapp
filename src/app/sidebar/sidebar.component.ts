@@ -12,6 +12,11 @@ export class SidebarComponent {
     }
 
     sendState() {
-        this.stateService.setState('Info from Shell');
+        var rnd = Math.random();
+        if (rnd>0.5) {
+            this.stateService.setState({A: rnd, ping: 'Info from Shell' })
+        } else {
+            this.stateService.setState({B: rnd, pong: 'Info from Shell' })
+        }
     }
 }

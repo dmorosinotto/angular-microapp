@@ -63,6 +63,9 @@ export class AppComponent {
   handleMessage(msg): void {
     //SAMPLE HANDLE EVENT (READ DATA FROM miniSPA)
     console.debug('shell received message: ', msg.detail);
+    //PROPAGETE MSG FOR CLIENTS (PING-PONG)
+    var action = msg.detail;
+    if (action && (action.A || action.B)) this.stateService.setState(action);
   }
 
 }
