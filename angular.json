@@ -138,6 +138,9 @@
             "browserTarget": "client-a:build"
           },
           "configurations": {
+            "standalone": {
+              "browserTarget": "client-a:build:debug"
+            },
             "production": {
               "browserTarget": "client-a:build:production"
             }
